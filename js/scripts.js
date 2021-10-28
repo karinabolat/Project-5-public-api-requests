@@ -6,28 +6,14 @@ const html = `
     <div class="modal">
         <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
         <div class="modal-info-container"></div>
-    </div>
-    <div class="modal-btn-container">
-        <button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
-        <button type="button" id="modal-next" class="modal-next btn">Next</button>
     </div>`
 modalContainer.innerHTML = html;
 modalContainer.style.display = 'none'
 
-const searchArea = `
-<form action="#" method="get">
-    <input type="search" id="search-input" class="search-input" placeholder="Search...">
-    <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
-</form>`
-
-const searchContainer = document.querySelector('.search-container');
-searchContainer.innerHTML = searchArea;
-const searchBar = document.getElementById('search-input');
-const searchForm = document.querySelector('form');
-
 /**
  * Fetches data on 12 employees and stores the information to a variable
  */
+
 const employees = fetch('https://randomuser.me/api/?results=12&inc=name,location,email,dob,cell,picture&nat=gb,us&noinfo')
     .then(response => response.json())
     .then(data => data.results)
@@ -48,7 +34,7 @@ function generateCard(person) {
     card.className = 'card';
     const html = `
         <div class="card-img-container">
-            <img class="card-img" src="${person.picture.thumbnail}" alt="profile picture">
+            <img class="card-img" src="${person.picture.large}" alt="profile picture">
         </div>
         <div class="card-info-container">
             <h3 id="name" class="card-name cap">${person.name.first} ${person.name.last}</h3>
@@ -68,7 +54,7 @@ function generateCard(person) {
 function getModal(person) {
     const modalInfo = modalContainer.querySelector('.modal-info-container');
     const html = `
-        <img class="modal-img" src="${person.picture.medium}" alt="profile picture">
+        <img class="modal-img" src="${person.picture.large}" alt="profile picture">
         <h3 id="name" class="modal-name cap">${person.name.first} ${person.name.last}</h3>
         <p class="modal-text">${person.email}</p>
         <p class="modal-text cap">${person.location.city}</p>
@@ -87,7 +73,9 @@ function getModal(person) {
  */
 function formatDOB(stringDOB) {
     const dob = new Date(stringDOB);
-    const newDOB = `${dob.getMonth()+1}/${dob.getDate()}/${dob.getFullYear()}`;
+    const month = ("0" + (dob.getMonth() + 1)).slice(-2);
+    const day = ("0" + dob.getDate()).slice(-2);
+    const newDOB = month +"/"+ day + `/${dob.getFullYear()}`;
     return newDOB;
 }
 
@@ -140,20 +128,3 @@ const button = document.getElementById('modal-close-btn');
 button.addEventListener('click', () => {
     modalContainer.style.display = 'none';
 });
-
-/**
- * Displays search results against user input
- */
-searchForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const text = searchBar.value.toLowerCase();
-    console.log(text);
-    gallery.innerHTML = '';
-    employees
-            .then(persons => persons.filter(person => `${person.name.first} ${person.name.last}`.toLowerCase().includes(text)))
-            .then(person => person.forEach(person => generateCard(person)))
-            .catch(error => console.log('There is a problem:', error))
-});
-
-const buttonNext = document.getElementById('modal-next');
-const buttonPrev = document.getElementById('modal-prev');
